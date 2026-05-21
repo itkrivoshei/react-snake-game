@@ -1,15 +1,26 @@
-import React from "react";
+import React, { memo } from "react";
 
-export default (props) => {
+function Snake({ snakePart }) {
   return (
     <>
-      {props.snakePart.map((part, i) => {
+      {snakePart.map((part, index) => {
         const style = {
           left: `${part[0]}%`,
           top: `${part[1]}%`,
         };
-        return <div className="snakePart" key={i} style={style}></div>;
+        const isHead = index === snakePart.length - 1;
+
+        return (
+          <div
+            aria-hidden="true"
+            className={`snakePart${isHead ? " snakeHead" : ""}`}
+            key={`${part[0]}-${part[1]}-${index}`}
+            style={style}
+          />
+        );
       })}
     </>
   );
-};
+}
+
+export default memo(Snake);
