@@ -1,8 +1,9 @@
 {
-  "name": "react-snake",
-  "homepage": ".",
+  "name": "react-snake-game",
+  "homepage": "https://itkrivoshei.github.io/react-snake-game",
   "version": "0.1.0",
   "private": true,
+  "description": "Modern React Snake game with keyboard controls, score tracking, collision logic, and GitHub Pages deployment.",
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
@@ -14,7 +15,8 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "react-scripts test --watchAll=false",
+    "test:watch": "react-scripts test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
