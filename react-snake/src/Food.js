@@ -1,9 +1,12 @@
-import React from "react";
+import React, { memo } from "react";
 
-export default (props) => {
+function Food({ part }) {
   const style = {
-    left: `${props.part[0]}%`,
-    top: `${props.part[1]}%`,
+    left: `${part[0]}%`,
+    top: `${part[1]}%`,
   };
-  return <div className="food" style={style}></div>;
-};
+
+  return <div aria-hidden="true" className="food" style={style} />;
+}
+
+export default memo(Food);
