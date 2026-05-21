@@ -2,7 +2,7 @@
 
 Modern browser-based Snake game built with React.
 
-This repository is maintained as a compact portfolio project. It shows an interactive frontend application with game state, keyboard input, collision detection, score tracking, responsive UI styling, and static deployment through GitHub Pages.
+This repository is maintained as a compact portfolio project. It shows an interactive frontend application with game state, keyboard input, collision detection, persistent high-score tracking, responsive UI styling, and static deployment through GitHub Pages.
 
 ## Live Demo
 
@@ -15,7 +15,9 @@ https://itkrivoshei.github.io/react-snake-game/
 The app implements the classic Snake loop in the browser:
 
 ```text
-Keyboard input
+Explicit start action
+  ↓
+Keyboard or mobile direction input
   ↓
 React state update
   ↓
@@ -32,18 +34,23 @@ Render board
 - JavaScript
 - HTML
 - CSS
+- Browser localStorage
 - GitHub Actions
 - GitHub Pages
 
 ## Features
 
 - Classic Snake gameplay
-- Keyboard controls with arrow keys
+- Explicit start screen before the snake starts moving
 - Start, pause, reset, and replay flow
-- Score and high-score tracking
+- Keyboard controls with arrow keys
+- Mobile-friendly direction pad
+- Score, level, and persistent high-score tracking
 - Food spawning logic that avoids the snake body
 - Wall and self-collision detection
+- Safer collision logic for moves into the previous tail position
 - Increasing speed after eating food
+- Auto-pause when the browser tab is hidden
 - Responsive dark UI
 - Static deployment through GitHub Pages
 
@@ -53,6 +60,8 @@ Render board
 | --- | --- |
 | `Arrow keys` | Move snake |
 | `Space` | Start or pause game |
+
+On mobile-sized screens, the app also displays direction buttons.
 
 ## Project Structure
 
@@ -140,11 +149,13 @@ Settings → Pages → Source → GitHub Actions
 This project is useful as a public portfolio repository because it demonstrates:
 
 - React component refactoring from class-based code to hooks
-- State lifecycle management with `useState`, `useEffect`, `useRef`, and `useCallback`
+- State lifecycle management with `useState`, `useEffect`, `useRef`, `useMemo`, and `useCallback`
 - Interval lifecycle management and cleanup
 - Keyboard event handling
+- Browser localStorage usage for high-score persistence
 - Collision detection and game-loop logic
 - Responsive UI design with CSS variables
+- Basic accessibility improvements through semantic labels and focus states
 - Static frontend deployment with GitHub Actions and GitHub Pages
 
 ## Status
