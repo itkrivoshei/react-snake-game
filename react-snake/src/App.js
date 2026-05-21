@@ -1,148 +1,341 @@
-import React, { Component } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Snake from "./Snake";
 import Food from "./Food";
 
-const getRandomFood = () => {
-  let min = 1;
-  let max = 98;
-  let x = Math.floor((Math.random() * (max - min + 1) + min) / 2) * 2;
-  let y = Math.floor((Math.random() * (max - min + 1) + min) / 2) * 2;
-  return [x, y];
+const GRID_SIZE = 100;
+const CELL_SIZE = 2;
+const START_SPEED = 180;
+const MIN_SPEED = 70;
+const SPEED_STEP = 8;
+const HIGH_SCORE_KEY = "react-snake-game-high-score";
+
+const DIRECTIONS = {
+  UP: [0, -CELL_SIZE],
+  DOWN: [0, CELL_SIZE],
+  LEFT: [-CELL_SIZE, 0],
+  RIGHT: [CELL_SIZE, 0],
 };
 
-const initialState = {
-  food: getRandomFood(),
-  speed: 200,
-  derection: "RIGHT",
-  snakePart: [
-    [0, 0],
-    [2, 0],
-    [4, 0],
-  ],
+const OPPOSITE_DIRECTIONS = {
+  UP: "DOWN",
+  DOWN: "UP",
+  LEFT: "RIGHT",
+  RIGHT: "LEFT",
 };
 
-class App extends Component {
-  constructor(props) {
-    super();
-    this.state = initialState;
+const STARTING_SNAKE = [
+  [20, 50],
+  [22, 50],
+  [24, 50],
+];
+
+const isSamePosition = ([x1, y1], [x2, y2]) => x1 === x2 && y1 === y2;
+
+const getStoredHighScore = () => {
+  try {
+    const value = window.localStorage.getItem(HIGH_SCORE_KEY);
+    return value ? Number(value) : 0;
+  } catch (error) {
+    return 0;
   }
+};
 
-  componentDidUpdate() {
-    this.ifOutBorder();
-    this.ifCollapse();
-    this.ifEat();
-    this.speed();
+const saveHighScore = (value) => {
+  try {
+    window.localStorage.setItem(HIGH_SCORE_KEY, String(value));
+  } catch (error) {
+    // Local storage can be unavailable in strict privacy modes.
   }
+};
 
-  componentDidMount() {
-    this.speed();
-    document.onkeydown = this.onKeyDown;
-  }
+const getRandomFood = (snake = STARTING_SNAKE) => {
+  const max = GRID_SIZE - CELL_SIZE;
+  let food;
 
-  speed() {
-    clearInterval(this.interval);
-    this.interval = setInterval(this.move, this.state.speed);
-  }
+  do {
+    const x = Math.floor((Math.random() * (max + 1)) / CELL_SIZE) * CELL_SIZE;
+    const y = Math.floor((Math.random() * (max + 1)) / CELL_SIZE) * CELL_SIZE;
+    food = [x, y];
+  } while (snake.some((part) => isSamePosition(part, food)));
 
-  onKeyDown = (e) => {
-    e = e || window.event;
-    switch (e.keyCode) {
-      case 38:
-        this.setState({ derection: "UP" });
-        break;
-      case 40:
-        this.setState({ derection: "DOWN" });
-        break;
-      case 37:
-        this.setState({ derection: "LEFT" });
-        break;
-      case 39:
-        this.setState({ derection: "RIGHT" });
-        break;
-    }
-  };
+  return food;
+};
 
-  move = () => {
-    let part = [...this.state.snakePart];
-    let head = part[part.length - 1];
+const createInitialGame = (highScore = 0) => ({
+  food: getRandomFood(STARTING_SNAKE),
+  speed: START_SPEED,
+  direction: "RIGHT",
+  snake: STARTING_SNAKE,
+  status: "ready",
+  score: 0,
+  highScore,
+});
 
-    switch (this.state.derection) {
-      case "RIGHT":
-        head = [head[0] + 2, head[1]];
-        break;
-      case "LEFT":
-        head = [head[0] - 2, head[1]];
-        break;
-      case "DOWN":
-        head = [head[0], head[1] + 2];
-        break;
-      case "UP":
-        head = [head[0], head[1] - 2];
-        break;
-    }
-    part.push(head);
-    part.shift();
-    this.setState({
-      snakePart: part,
-    });
-  };
+function App() {
+  const [game, setGame] = useState(() => createInitialGame(getStoredHighScore()));
+  const directionRef = useRef("RIGHT");
+  const nextDirectionRef = useRef("RIGHT");
 
-  ifOutBorder() {
-    let head = this.state.snakePart[this.state.snakePart.length - 1];
-    if (head[0] >= 100 || head[1] >= 100 || head[0] < 0 || head[1] < 0) {
-      this.gameOver();
-    }
-  }
+  const level = useMemo(() => Math.floor(game.score / 3) + 1, [game.score]);
 
-  ifCollapse() {
-    let snake = [...this.state.snakePart];
-    let head = snake[snake.length - 1];
-    snake.pop();
-    snake.forEach((part) => {
-      if (head[0] === part[0] && head[1] === part[1]) {
-        this.gameOver();
+  const resetDirection = useCallback((direction = "RIGHT") => {
+    directionRef.current = direction;
+    nextDirectionRef.current = direction;
+  }, []);
+
+  const startGame = useCallback(() => {
+    setGame((currentGame) => {
+      if (currentGame.status === "game-over") {
+        const nextGame = createInitialGame(currentGame.highScore);
+        resetDirection(nextGame.direction);
+
+        return {
+          ...nextGame,
+          status: "playing",
+        };
       }
+
+      return {
+        ...currentGame,
+        status: "playing",
+      };
     });
-  }
+  }, [resetDirection]);
 
-  ifEat() {
-    let head = this.state.snakePart[this.state.snakePart.length - 1];
-    let food = this.state.food;
-    if (head[0] === food[0] && head[1] === food[1]) {
-      let newState = { ...this.state };
-      newState.food = getRandomFood();
-      newState.snakePart = this.incSnake();
-      newState.speed = this.incSpeed();
-      this.setState(newState);
-      this.speed();
+  const pauseGame = useCallback(() => {
+    setGame((currentGame) => ({
+      ...currentGame,
+      status: currentGame.status === "playing" ? "paused" : currentGame.status,
+    }));
+  }, []);
+
+  const resetGame = useCallback(() => {
+    setGame((currentGame) => {
+      const nextGame = createInitialGame(currentGame.highScore);
+      resetDirection(nextGame.direction);
+      return nextGame;
+    });
+  }, [resetDirection]);
+
+  const updateDirection = useCallback((nextDirection) => {
+    const currentDirection = directionRef.current;
+
+    if (OPPOSITE_DIRECTIONS[currentDirection] === nextDirection) {
+      return;
     }
-  }
 
-  incSnake() {
-    let newSnake = [...this.state.snakePart];
-    newSnake.unshift([]);
-    return newSnake;
-  }
+    nextDirectionRef.current = nextDirection;
+  }, []);
 
-  incSpeed() {
-    if (this.state.speed > 50) {
-      return this.state.speed - 10;
+  const moveSnake = useCallback(() => {
+    setGame((currentGame) => {
+      if (currentGame.status !== "playing") {
+        return currentGame;
+      }
+
+      const direction = nextDirectionRef.current;
+      const [deltaX, deltaY] = DIRECTIONS[direction];
+      const head = currentGame.snake[currentGame.snake.length - 1];
+      const nextHead = [head[0] + deltaX, head[1] + deltaY];
+      const hitWall =
+        nextHead[0] < 0 ||
+        nextHead[1] < 0 ||
+        nextHead[0] >= GRID_SIZE ||
+        nextHead[1] >= GRID_SIZE;
+      const ateFood = isSamePosition(nextHead, currentGame.food);
+      const bodyForCollision = ateFood ? currentGame.snake : currentGame.snake.slice(1);
+      const hitSelf = bodyForCollision.some((part) => isSamePosition(part, nextHead));
+
+      if (hitWall || hitSelf) {
+        return {
+          ...currentGame,
+          status: "game-over",
+          highScore: Math.max(currentGame.highScore, currentGame.score),
+        };
+      }
+
+      const nextSnake = ateFood
+        ? [...currentGame.snake, nextHead]
+        : [...currentGame.snake.slice(1), nextHead];
+      const nextScore = ateFood ? currentGame.score + 1 : currentGame.score;
+
+      directionRef.current = direction;
+
+      return {
+        ...currentGame,
+        direction,
+        snake: nextSnake,
+        food: ateFood ? getRandomFood(nextSnake) : currentGame.food,
+        score: nextScore,
+        highScore: Math.max(currentGame.highScore, nextScore),
+        speed: ateFood ? Math.max(MIN_SPEED, currentGame.speed - SPEED_STEP) : currentGame.speed,
+      };
+    });
+  }, []);
+
+  useEffect(() => {
+    saveHighScore(game.highScore);
+  }, [game.highScore]);
+
+  useEffect(() => {
+    if (game.status !== "playing") {
+      return undefined;
     }
-  }
 
-  gameOver() {
-    alert(`Game Over, snake lenght is: ${this.state.snakePart.length}`);
-    this.setState(initialState);
-  }
+    const timerId = window.setInterval(moveSnake, game.speed);
 
-  render() {
-    return (
-      <div className="game">
-        <Snake snakePart={this.state.snakePart} />
-        <Food part={this.state.food} />
-      </div>
-    );
-  }
+    return () => window.clearInterval(timerId);
+  }, [game.speed, game.status, moveSnake]);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      const keyMap = {
+        ArrowUp: "UP",
+        ArrowDown: "DOWN",
+        ArrowLeft: "LEFT",
+        ArrowRight: "RIGHT",
+      };
+
+      if (keyMap[event.key]) {
+        event.preventDefault();
+
+        if (game.status === "playing") {
+          updateDirection(keyMap[event.key]);
+        }
+
+        return;
+      }
+
+      if (event.code === "Space") {
+        event.preventDefault();
+
+        if (game.status === "playing") {
+          pauseGame();
+        } else {
+          startGame();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [game.status, pauseGame, startGame, updateDirection]);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        pauseGame();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, [pauseGame]);
+
+  const isPlaying = game.status === "playing";
+  const isOverlayVisible = game.status !== "playing";
+  const statusLabel = game.status.replace("-", " ");
+  const overlayTitle =
+    game.status === "game-over"
+      ? "Game over"
+      : game.status === "paused"
+      ? "Paused"
+      : "Ready";
+  const overlayText =
+    game.status === "game-over"
+      ? `Final score: ${game.score}. Start a new run.`
+      : game.status === "paused"
+      ? "Press start to continue."
+      : "Press start to begin. The snake does not move before you start.";
+
+  return (
+    <main className="app-shell">
+      <section className="game-panel" aria-label="React Snake Game">
+        <div className="hero">
+          <p className="eyebrow">React arcade project</p>
+          <h1>Snake Game</h1>
+          <p className="description">
+            Polished browser Snake with explicit start flow, keyboard controls,
+            score tracking, collision logic, and GitHub Pages deployment.
+          </p>
+        </div>
+
+        <div className="stats-grid" aria-label="Game statistics">
+          <div className="stat-card">
+            <span>Score</span>
+            <strong>{game.score}</strong>
+          </div>
+          <div className="stat-card">
+            <span>High score</span>
+            <strong>{game.highScore}</strong>
+          </div>
+          <div className="stat-card">
+            <span>Level</span>
+            <strong>{level}</strong>
+          </div>
+          <div className="stat-card">
+            <span>Status</span>
+            <strong>{statusLabel}</strong>
+          </div>
+        </div>
+
+        <div className="game-board-wrap">
+          <div className="game" role="img" aria-label={`Snake board. Score: ${game.score}`}>
+            <Snake snakePart={game.snake} />
+            <Food part={game.food} />
+
+            {isOverlayVisible && (
+              <div className="game-overlay" role="status" aria-live="polite">
+                <h2>{overlayTitle}</h2>
+                <p>{overlayText}</p>
+                <button className="overlay-action" type="button" onClick={startGame}>
+                  {game.status === "game-over" ? "Play again" : "Start"}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="actions">
+          <button
+            className={`primary-action${isPlaying ? " is-playing" : ""}`}
+            type="button"
+            onClick={isPlaying ? pauseGame : startGame}
+          >
+            {isPlaying ? "Pause" : game.status === "game-over" ? "Play again" : "Start"}
+          </button>
+          <button className="secondary-action" type="button" onClick={resetGame}>
+            Reset
+          </button>
+        </div>
+
+        <div className="direction-pad" aria-label="Mobile direction controls">
+          <button type="button" onClick={() => updateDirection("UP")} disabled={!isPlaying}>
+            ↑
+          </button>
+          <div>
+            <button type="button" onClick={() => updateDirection("LEFT")} disabled={!isPlaying}>
+              ←
+            </button>
+            <button type="button" onClick={() => updateDirection("DOWN")} disabled={!isPlaying}>
+              ↓
+            </button>
+            <button type="button" onClick={() => updateDirection("RIGHT")} disabled={!isPlaying}>
+              →
+            </button>
+          </div>
+        </div>
+
+        <footer className="help-row">
+          <span>Arrow keys: move</span>
+          <span>Space: start / pause</span>
+          <span>Auto-pause when tab is hidden</span>
+        </footer>
+      </section>
+    </main>
+  );
 }
 
 export default App;
