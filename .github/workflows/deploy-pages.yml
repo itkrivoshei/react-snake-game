@@ -36,6 +36,9 @@ jobs:
           cache: npm
           cache-dependency-path: react-snake/package-lock.json
 
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
       - name: Install dependencies
         working-directory: react-snake
         run: npm install
