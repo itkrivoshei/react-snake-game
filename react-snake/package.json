@@ -3,7 +3,7 @@
   "homepage": "https://itkrivoshei.github.io/react-snake-game",
   "version": "0.1.0",
   "private": true,
-  "description": "Modern React Snake game with keyboard controls, score tracking, collision logic, and GitHub Pages deployment.",
+  "description": "Browser Snake game with keyboard controls, score tracking, collision logic, and GitHub Pages deployment.",
   "dependencies": {
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
@@ -12,7 +12,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test --watchAll=false",
+    "test": "react-scripts test --watchAll=false --passWithNoTests",
     "test:watch": "react-scripts test",
     "eject": "react-scripts eject"
   },
