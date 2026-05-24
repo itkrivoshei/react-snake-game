@@ -257,8 +257,8 @@ function App() {
           <p className="eyebrow">React arcade project</p>
           <h1>Snake Game</h1>
           <p className="description">
-            Polished browser Snake with explicit start flow, keyboard controls,
-            score tracking, collision logic, and GitHub Pages deployment.
+            Browser Snake with explicit start flow, keyboard controls, score tracking,
+            collision logic, and GitHub Pages deployment.
           </p>
         </div>
 
