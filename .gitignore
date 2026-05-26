@@ -21,3 +21,7 @@ yarn-error.log*
 .DS_Store
 .idea/
 .vscode/
+__pycache__/
+*.pyc
+coverage/
+.pytest_cache/
