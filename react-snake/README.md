@@ -1,8 +1,8 @@
 # React Snake Game App
 
-Source application for the React Snake Game portfolio project.
+Source application for the React Snake Game.
 
-The root README contains the main project description, live demo, portfolio notes, and deployment information.
+The root README contains the main project description, live app link, and deployment information.
 
 ## Scripts
 

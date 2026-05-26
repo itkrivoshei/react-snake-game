@@ -50,15 +50,16 @@ const saveHighScore = (value) => {
 
 const getRandomFood = (snake = STARTING_SNAKE) => {
   const max = GRID_SIZE - CELL_SIZE;
-  let food;
 
-  do {
+  while (true) {
     const x = Math.floor((Math.random() * (max + 1)) / CELL_SIZE) * CELL_SIZE;
     const y = Math.floor((Math.random() * (max + 1)) / CELL_SIZE) * CELL_SIZE;
-    food = [x, y];
-  } while (snake.some((part) => isSamePosition(part, food)));
+    const food = [x, y];
 
-  return food;
+    if (!snake.some((part) => isSamePosition(part, food))) {
+      return food;
+    }
+  }
 };
 
 const createInitialGame = (highScore = 0) => ({
