@@ -9,8 +9,6 @@ Classic Snake gameplay in React with keyboard controls, mobile buttons, persiste
 [![React](https://img.shields.io/badge/React-16-61dafb?style=for-the-badge&logo=react&logoColor=111)](react-snake/package.json)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](LICENSE)
 
-### [Play Live Game ->](https://itkrivoshei.github.io/react-snake-game/)
-
 </div>
 
 ## Gameplay
@@ -55,8 +53,6 @@ Open `http://localhost:3000`.
 ## Deployment
 
 The Pages workflow builds from `react-snake/`, copies `index.html` to `404.html` for SPA fallback, and uploads `react-snake/build`.
-
-Play here: https://itkrivoshei.github.io/react-snake-game/
 
 ## License
 
