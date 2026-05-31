@@ -5,7 +5,7 @@
 Classic Snake gameplay in React with keyboard controls, mobile buttons, persistent high score, and GitHub Pages deployment.
 
 [![Play](https://img.shields.io/badge/play-GitHub%20Pages-2ea44f?style=for-the-badge&logo=githubpages&logoColor=white)](https://itkrivoshei.github.io/react-snake-game/)
-[![Deploy](https://img.shields.io/github/actions/workflow/status/itkrivoshei/react-snake-game/deploy-pages.yml?branch=master&style=for-the-badge&label=deploy&logo=githubactions&logoColor=white)](https://github.com/itkrivoshei/react-snake-game/actions/workflows/deploy-pages.yml)
+[![Deploy](https://img.shields.io/github/actions/workflow/status/itkrivoshei/react-snake-game/deploy-pages.yml?branch=main&style=for-the-badge&label=deploy&logo=githubactions&logoColor=white)](https://github.com/itkrivoshei/react-snake-game/actions/workflows/deploy-pages.yml)
 [![React](https://img.shields.io/badge/React-16-61dafb?style=for-the-badge&logo=react&logoColor=111)](react-snake/package.json)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](LICENSE)
 
