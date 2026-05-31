@@ -6,7 +6,7 @@ Classic Snake gameplay in React with keyboard controls, mobile buttons, persiste
 
 [![Play](https://img.shields.io/badge/play-GitHub%20Pages-2ea44f?style=for-the-badge&logo=githubpages&logoColor=white)](https://itkrivoshei.github.io/react-snake-game/)
 [![Deploy](https://img.shields.io/github/actions/workflow/status/itkrivoshei/react-snake-game/deploy-pages.yml?branch=main&style=for-the-badge&label=deploy&logo=githubactions&logoColor=white)](https://github.com/itkrivoshei/react-snake-game/actions/workflows/deploy-pages.yml)
-[![React](https://img.shields.io/badge/React-16-61dafb?style=for-the-badge&logo=react&logoColor=111)](react-snake/package.json)
+[![React](https://img.shields.io/badge/React-19-61dafb?style=for-the-badge&logo=react&logoColor=111)](react-snake/package.json)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](LICENSE)
 
 </div>
@@ -26,7 +26,7 @@ Classic Snake gameplay in React with keyboard controls, mobile buttons, persiste
 ```bash
 git clone https://github.com/itkrivoshei/react-snake-game.git
 cd react-snake-game/react-snake
-npm install
+npm ci
 npm start
 ```
 
@@ -36,9 +36,9 @@ Open `http://localhost:3000`.
 
 | Command | Purpose |
 | --- | --- |
-| `npm start` | Run the CRA dev server |
+| `npm start` | Run the Vite dev server |
 | `npm run build` | Build the static game |
-| `npm test` | Run the default CRA test command |
+| `npm test` | Run the Vitest command once |
 
 ## Implementation Notes
 
@@ -52,7 +52,7 @@ Open `http://localhost:3000`.
 
 ## Deployment
 
-The Pages workflow builds from `react-snake/`, copies `index.html` to `404.html` for SPA fallback, and uploads `react-snake/build`.
+The Pages workflow builds from `react-snake/`, copies `index.html` to `404.html` for SPA fallback, and uploads `react-snake/dist`.
 
 ## License
 

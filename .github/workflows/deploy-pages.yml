@@ -11,11 +11,6 @@ permissions:
   pages: write
   id-token: write
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-  NODE_OPTIONS: --openssl-legacy-provider
-  CI: false
-
 concurrency:
   group: github-pages
   cancel-in-progress: true
@@ -41,25 +36,25 @@ jobs:
 
       - name: Install dependencies
         working-directory: react-snake
-        run: npm install
+        run: npm ci --loglevel=error
 
       - name: Build static app
         working-directory: react-snake
         run: npm run build
 
       - name: Add SPA fallback
-        run: cp react-snake/build/index.html react-snake/build/404.html
+        run: cp react-snake/dist/index.html react-snake/dist/404.html
 
       - name: Verify build output
         run: |
-          test -f react-snake/build/index.html
-          test -f react-snake/build/404.html
-          ls -la react-snake/build
+          test -f react-snake/dist/index.html
+          test -f react-snake/dist/404.html
+          ls -la react-snake/dist
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5
         with:
-          path: react-snake/build
+          path: react-snake/dist
 
   deploy:
     name: Deploy to GitHub Pages
